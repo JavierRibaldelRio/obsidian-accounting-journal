@@ -1,134 +1,99 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import pgcDataJson from './assets/PGC-2017.json';
+
+const pgcData: Record<string, string> = pgcDataJson as Record<string, string>;
+
+
 
 // Remember to rename these classes and interfaces!
 
-interface MyPluginSettings {
+interface AccountingJournalPluginSettings {
 	mySetting: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: AccountingJournalPluginSettings = {
 	mySetting: 'default'
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
-
+export default class AccountingJournalPlugin extends Plugin {
 	async onload() {
-		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
+		// Accountability Journal, Diary Book (Libro diario)
+		this.registerMarkdownCodeBlockProcessor('acj', (source, el, ctx) => {
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
+			// Get the the first row to get the date and the description & the content
+			const firstLineEnd = source.indexOf('\n')
+			const [date, description] = source.substring(0, firstLineEnd).split(",");
+			const contentString = source.substring(firstLineEnd);
 
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
 
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
+			const journalEntries = contentString.split(/={3,}/)					// Splits by each entry
+				.map((entry) =>
+					entry.split(/-{3,}/)										// For each entry splits between debit & credit
+						.map(part => part.trim().split("\n")					// For each part splits the different lines
+							.map(note => {
+
+								// For each line, gets the ammount and the number of the accunt
+								let [ammountS, text] = note.split('-').map(x => x.trim());
+
+								const ammount: number = Number(ammountS);
+
+								let accountName: string = text;
+
+								const accountNumber: number = Number(text);
+
+								// If the account field is a number looks for its name on PGC
+								if (!isNaN(accountNumber)) {
+
+									const name: string = pgcData[String(accountNumber)];
+									accountName = '(' + accountNumber + ')' + ((name) ? (' ' + name) : "");
+
+								}
+								return [ammount, accountName];
+							})
+						)
+
+				);
+
+
+			// Create the table
+			const table = el.createEl('table', { attr: { class: "acjp-table" } });
+
+			// Create the header row
+			const header = table.createEl('thead');
+			const headerRow = header.createEl('tr');
+			headerRow.createEl('td', { text: date, attr: { colspan: "5", class: "acjp-center" } });
+
+			journalEntries.forEach((entry) => {
+				const debits = entry[0];
+				const credits = entry[1];
+				const max = Math.max(debits.length, credits.length);
+
+				const body = table.createEl('tbody');
+
+
+				for (let i = 0; i < max; i++) {
+					const debitAccount: number | string = debits[i]?.[1] || "";
+					const creditAccount: number | string = credits[i]?.[1] || "";
+
+					const debitAmount: number | string = debits[i]?.[0] || "";
+					const creditAmount: number | string = credits[i]?.[0] || "";
+
+					const row = body.createEl("tr");
+					row.createEl('td', { text: debitAmount.toString(), attr: { class: 'acjp-number' } });
+					row.createEl('td', { text: debitAccount.toString(), attr: { class: 'acjp-name' } });
+					row.createEl('td', { text: 'a', attr: { class: 'acjp-separator acjp-center' } }); // columna vacía separadora
+					row.createEl('td', { text: creditAccount.toString(), attr: { class: 'acjp-name' } });
+					row.createEl('td', { text: creditAmount.toString(), attr: { class: 'acjp-number' } });
 				}
-			}
+			});
+
+			console.log('description :>> ', description);
+			table.createEl('tbody').createEl('tr').createEl('td', { text: description, attr: { colspan: "5", class: 'acjp-center' } });
+
+
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
-	}
-
-	onunload() {
-
-	}
-
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
 	}
 }
 
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
-	}
-}

@@ -6,3 +6,44 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+.acjp-table {
+
+    border-collapse: separate !important;
+
+}
+
+.acjp-table * tr td {
+    border: 0;
+}
+
+.acjp-table .acjp-center {
+
+    text-align: center;
+}
+
+
+.acjp-table .acjp-number {
+    text-align: right;
+    width: 15%;
+}
+
+.acjp-table .acjp-name {
+    width: 32%;
+}
+
+.acjp-table .acjp-separator {
+    width: 6%;
+}
+
+.acjp-table tbody tr:first-child td:nth-child(even) {
+
+    border-top: 1.5px solid;
+
+}
+
+
+.acjp-table tbody tr:last-child td:nth-child(even) {
+
+    border-bottom: 1.5px solid
+}
