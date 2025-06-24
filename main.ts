@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, TFile, Setting } from 'obsidian';
+import { Plugin, TFile } from 'obsidian';
 import { AccountingJournalSettingsTab } from 'src/AccountingJournalSettingTab';
 import type { accountEquivalent } from 'types/accountingTypes';
 import { AccountingTransformer } from 'utils/AccountingTransformer';
@@ -34,7 +34,6 @@ export default class AccountingJournalPlugin extends Plugin {
 		this.app.workspace.onLayoutReady(async () => {
 			await this.generateAccountEquivalence();
 
-
 			// Accountability Journal, Diary Book (Libro diario)
 			this.registerMarkdownCodeBlockProcessor('acj', async (source, el, ctx) => {
 
@@ -56,11 +55,7 @@ export default class AccountingJournalPlugin extends Plugin {
 		// Get the file path from settings
 		try {
 			const filePath = this.settings.defaultEquivCsvPath;
-
 			this.accountEquivalence = await this.readCSVFile(filePath);
-
-			console.log('this.accountEquivalence :>> ', this.accountEquivalence);
-
 		}
 		catch (e) {
 			console.error("Error parsing account equivalence CSV file:", e);
@@ -86,7 +81,6 @@ export default class AccountingJournalPlugin extends Plugin {
 		const content: string = await this.app.vault.cachedRead(file)
 
 		// Parse the CSV content
-
 		return parseCSVAccountingEquivalences(content);
 
 	}
@@ -113,6 +107,9 @@ export default class AccountingJournalPlugin extends Plugin {
 				}
 			}
 		} catch (e) {
+			console.error("Error getting account equivalence from frontmatter:", e);
+
+
 		}
 
 		return this.accountEquivalence;
