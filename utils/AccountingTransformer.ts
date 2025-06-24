@@ -1,8 +1,29 @@
 import type { accountEquivalent, JournalEntries, JournalEntry, JournalEntryLine } from '../types/accountingTypes'
 
+type FullJournalEntryParams = {
+    date: string;
+    description: string;
+    entries: JournalEntries;
+    balanced: boolean;
+};
+
+export class FullJournalEntry {
+    date: string;
+    description: string;
+    entries: JournalEntries;
+    balanced: boolean;
+
+    constructor({ date, description, entries, balanced }: FullJournalEntryParams) {
+        this.date = date;
+        this.description = description;
+        this.entries = entries;
+        this.balanced = balanced;
+    }
+}
+
 export class AccountingTransformer {
 
-    static transformToJournal(content: string, el: HTMLElement, acEquiv: accountEquivalent, commaAsDecimal: boolean): void {
+    static generateJournalEntries(content: string, acEquiv: accountEquivalent): FullJournalEntry {
 
         // Get the the first row to get the date and the description & the content
         const firstLineEnd = content.indexOf('\n')
@@ -66,7 +87,20 @@ export class AccountingTransformer {
             });
 
 
-        console.log('balanced :>> ', balanced);
+        return new FullJournalEntry({
+            date: date.trim(),
+            description: description.trim(),
+            entries: journalEntries,
+            balanced: balanced
+        });
+    }
+
+
+    static createJournalEntryHTML(fullJourntal: FullJournalEntry, el: HTMLElement, commaAsDecimal: boolean): void {
+
+        const { date, description, entries, balanced } = fullJourntal;
+
+        console.log('date :>> ', date);
 
         // Create the table & adding red border when needed
         const table = el.createEl('table', { attr: { class: "acjp-table" + (!balanced ? " acjp-not-balanced" : '') } });
@@ -76,7 +110,7 @@ export class AccountingTransformer {
         const headerRow = header.createEl('tr');
         headerRow.createEl('td', { text: date, attr: { colspan: "5", class: "acjp-center" } });
 
-        journalEntries.forEach((entry) => {
+        entries.forEach((entry) => {
             const debits = entry[0];
             const credits = entry[1];
             const max = Math.max(debits.length, credits.length);
@@ -102,9 +136,16 @@ export class AccountingTransformer {
 
         // Entry description
         table.createEl('tbody').createEl('tr').createEl('td', { text: description, attr: { colspan: "5", class: 'acjp-center' } });
-
-
     }
+
+
+    static transformToJournal(content: string, el: HTMLElement, acEquiv: accountEquivalent, commaAsDecimal: boolean): void {
+
+        const fullEntry = this.generateJournalEntries(content, acEquiv);
+        this.createJournalEntryHTML(fullEntry, el, commaAsDecimal);
+    }
+
+
 
     /**
      * Formats a number according to the selected locale.
@@ -117,3 +158,5 @@ export class AccountingTransformer {
 
     }
 }
+
+
