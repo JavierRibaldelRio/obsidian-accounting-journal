@@ -7,10 +7,11 @@ If your plugin does not need CSS, delete this file.
 
 */
 
-.acjp-table {
 
-    border-collapse: separate !important;
+table.acjp-table {
 
+    border-collapse: separate;
+    border-spacing: 10px;
 }
 
 .acjp-table * tr td {
@@ -36,14 +37,22 @@ If your plugin does not need CSS, delete this file.
     width: 6%;
 }
 
+
+
 .acjp-table tbody tr:first-child td:nth-child(even) {
 
     border-top: 1.5px solid;
-
 }
 
 
 .acjp-table tbody tr:last-child td:nth-child(even) {
 
     border-bottom: 1.5px solid
+}
+
+/* Adds read color to journal if it is not balanced (selector .class1.class2 aplies the format to those HTML elements that have both classes */
+
+.acjp-table.acjp-not-balanced tbody tr:last-child td:nth-child(even),
+.acjp-table.acjp-not-balanced tbody tr:first-child td:nth-child(even) {
+    border-color: var(--text-error, #ff0000);
 }
