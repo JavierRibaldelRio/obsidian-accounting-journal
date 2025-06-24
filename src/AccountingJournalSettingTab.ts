@@ -16,8 +16,8 @@ export class AccountingJournalSettingsTab extends PluginSettingTab {
         containerEl.empty();
 
         new Setting(containerEl)
-            .setName('Date format')
-            .setDesc('Default date formsat')
+            .setName('Use comma as decimal separator (European system)')
+            .setDesc('If enabled, numbers will use a comma (e.g. 1.103,14) instead of a dot (e.g. 1,103.14) as the decimal separator.')
             .addToggle((tog) =>
                 tog
                     .setValue(this.plugin.settings.commaAsDecimal)
