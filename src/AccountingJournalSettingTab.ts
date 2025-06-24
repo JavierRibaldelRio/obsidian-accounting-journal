@@ -17,7 +17,7 @@ export class AccountingJournalSettingsTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Use comma as decimal separator (European system)')
-            .setDesc('If enabled, numbers will use a comma (e.g. 1.103,14) instead of a dot (e.g. 1,103.14) as the decimal separator.')
+            .setDesc('If enabled, numbers will use a comma (e.g. 1.103,14) instead of a dot (e.g. 1,103.14) as the decimal separator. This only applies to output formatting; for input, both formats are supported.')
             .addToggle((tog) =>
                 tog
                     .setValue(this.plugin.settings.commaAsDecimal)
