@@ -7,11 +7,22 @@ If your plugin does not need CSS, delete this file.
 
 */
 
+div.acjp-error {
+
+
+    font-family: var(---font-monospace-theme, monospace);
+    border: 2px solid var(--text-error, #ff0000);
+    border-radius: var(--radius-s, 4px);
+    padding: 4px 8px;
+
+}
 
 table.acjp-table {
 
     border-collapse: separate;
     border-spacing: 10px;
+
+
 }
 
 .acjp-table * tr td {
