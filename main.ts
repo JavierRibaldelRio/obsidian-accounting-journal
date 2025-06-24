@@ -1,8 +1,10 @@
-import { Plugin, TFile } from 'obsidian';
+import { Plugin, TFile, Notice } from 'obsidian';
+
 import { AccountingJournalSettingsTab } from 'src/AccountingJournalSettingTab';
 import type { accountEquivalent } from 'types/accountingTypes';
 import { AccountingTransformer } from 'utils/AccountingTransformer';
 import { parseCSVAccountingEquivalences } from 'utils/parseCSVAccountingEquivalences';
+
 import pgcDataJson from './assets/PGC-2017.json';
 
 // Default account equivalence data
@@ -42,7 +44,6 @@ export default class AccountingJournalPlugin extends Plugin {
 
 				const accountEquiv: accountEquivalent = await this.getaccountEquivalence();
 
-				console.log('accountEquiv :>> ', accountEquiv);
 				AccountingTransformer.transformToJournal(source, el, accountEquiv, commaAsDecimalJournal);
 			});
 
@@ -55,7 +56,17 @@ export default class AccountingJournalPlugin extends Plugin {
 		// Get the file path from settings
 		try {
 			const filePath = this.settings.defaultEquivCsvPath;
-			this.accountEquivalence = await this.readCSVFile(filePath);
+
+			console.log('filePath :>> ', filePath);
+			if (!filePath || filePath === "/") {
+
+				console.info("Spanish account system data");
+
+				this.accountEquivalence = pgcData; // Fallback to PGC data
+
+			} else {
+				this.accountEquivalence = await this.readCSVFile(filePath);
+			}
 		}
 		catch (e) {
 			console.error("Error parsing account equivalence CSV file:", e);
@@ -109,6 +120,7 @@ export default class AccountingJournalPlugin extends Plugin {
 		} catch (e) {
 			console.error("Error getting account equivalence from frontmatter:", e);
 
+			new Notice("Error getting account equivalence from frontmatter. Using default settings.");
 
 		}
 
