@@ -73,7 +73,7 @@ export default class AccountingJournalPlugin extends Plugin {
 			throw new Error("Not found account equivalence file path in settings.");
 		}
 
-		const file = await this.app.vault.getFileByPath(filePath);
+		const file = this.app.vault.getFileByPath(filePath);
 		if (!(file && file instanceof TFile)) {
 			throw new Error(`File not found at path: ${filePath}`);
 		}
