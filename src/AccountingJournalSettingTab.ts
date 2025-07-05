@@ -28,6 +28,21 @@ export class AccountingJournalSettingsTab extends PluginSettingTab {
                     })
             );
 
+        // Journal separator
+        new Setting(containerEl)
+            .setName('Journal separator')
+            .setDesc('Character used to separate the credit and debit columns in the journal. This is used to format the journal entries.')
+            .addText(text =>
+                text
+                    .setPlaceholder('-')
+                    .setValue(this.plugin.settings.journalSeparator)
+                    .onChange(async (value) => {
+                        // Changes the settings value
+                        this.plugin.settings.journalSeparator = value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
 
         new Setting(containerEl)
             .setName('Default account equivalence file')

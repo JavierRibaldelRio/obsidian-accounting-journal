@@ -34,11 +34,11 @@ export class LedgerEntry {
 export class AccountingTransformer {
 
 
-    static transformToJournal(content: string, el: HTMLElement, acEquiv: accountEquivalent, commaAsDecimal: boolean): void {
+    static transformToJournal(content: string, el: HTMLElement, acEquiv: accountEquivalent, commaAsDecimal: boolean, separtor: string): void {
 
         try {
             const fullEntry = this.generateJournalEntries(content, acEquiv);
-            this.createJournalEntryHTML(fullEntry, el, commaAsDecimal);
+            this.createJournalEntryHTML(fullEntry, el, commaAsDecimal, separtor);
 
         } catch (error) {
             console.error('Error generating accounting journal entries: ', error);
@@ -155,7 +155,7 @@ export class AccountingTransformer {
         });
     }
 
-    static createJournalEntryHTML(fullJournal: FullJournalEntry, el: HTMLElement, commaAsDecimal: boolean): void {
+    static createJournalEntryHTML(fullJournal: FullJournalEntry, el: HTMLElement, commaAsDecimal: boolean, separator: string): void {
 
         const { date, description, entries, balanced } = fullJournal;
 
@@ -187,7 +187,7 @@ export class AccountingTransformer {
                 const row = body.createEl("tr");
                 row.createEl('td', { text: debitAmount, attr: { class: 'acjp-number' } });
                 row.createEl('td', { text: debitAccount, attr: { class: 'acjp-name' } });
-                row.createEl('td', { text: 'a', attr: { class: 'acjp-separator acjp-center' } }); // separator
+                row.createEl('td', { text: separator, attr: { class: 'acjp-separator acjp-center' } }); // separator
                 row.createEl('td', { text: creditAccount, attr: { class: 'acjp-name' } });
                 row.createEl('td', { text: creditAmount, attr: { class: 'acjp-number' } });
             }

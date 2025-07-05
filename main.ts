@@ -12,11 +12,13 @@ const pgcData: accountEquivalent = pgcDataJson as accountEquivalent;
 
 interface AccountingJournalPluginSettings {
 	commaAsDecimal: boolean;
+	journalSeparator: string
 	defaultEquivCsvPath: string
 }
 
 const DEFAULT_SETTINGS: AccountingJournalPluginSettings = {
 	commaAsDecimal: false,
+	journalSeparator: '',
 	defaultEquivCsvPath: ''
 };
 
@@ -40,10 +42,12 @@ export default class AccountingJournalPlugin extends Plugin {
 
 				// Check if is commaAsDecimal is overriden by local config through props
 				const commaAsDecimalJournal: boolean = this.getCommaAsDecimal()
+				const journalSeparator: string = this.getJournalSeparator();
 
+				console.log('journalSeparator :>> ', journalSeparator);
 				const accountEquiv: accountEquivalent = await this.getaccountEquivalence();
 
-				AccountingTransformer.transformToJournal(source, el, accountEquiv, commaAsDecimalJournal);
+				AccountingTransformer.transformToJournal(source, el, accountEquiv, commaAsDecimalJournal, journalSeparator);
 			});
 
 
@@ -70,7 +74,6 @@ export default class AccountingJournalPlugin extends Plugin {
 				AccountingTransformer.transformToLedger(source, el, accountEquiv, commaAsDecimalLedger);
 
 			});
-
 		});
 
 	}
@@ -121,6 +124,48 @@ export default class AccountingJournalPlugin extends Plugin {
 	}
 
 	// Getters
+
+
+	getCommaAsDecimal(): boolean {
+
+		// Check if the setting is overriden by frontmatter
+		try {
+			const file = this.app.workspace.getActiveFile();
+			if (!file) throw new Error("No active file");
+
+			const metadata = this.app.metadataCache.getFileCache(file);
+			const fm = metadata?.frontmatter;
+
+			// override by frontmatter
+			if (fm && typeof fm["acj-commaAsDecimal"] === "boolean") {
+				return fm["acj-commaAsDecimal"];
+			}
+		} catch (e) {
+		}
+
+		return this.settings.commaAsDecimal;
+
+	}
+
+	getJournalSeparator(): string {
+		// Check if the setting is overriden by frontmatter
+		try {
+			const file = this.app.workspace.getActiveFile();
+			if (!file) throw new Error("No active file");
+
+			const metadata = this.app.metadataCache.getFileCache(file);
+			const fm = metadata?.frontmatter;
+
+			// override by frontmatter
+			if (fm && typeof fm["acj-journalSeparator"] === "string") {
+				return fm["acj-journalSeparator"];
+			}
+		} catch (e) {
+		}
+
+		return this.settings.journalSeparator;
+	}
+
 	async getaccountEquivalence(): Promise<accountEquivalent> {
 
 		// Check if the setting is overriden by frontmatter
@@ -149,27 +194,6 @@ export default class AccountingJournalPlugin extends Plugin {
 		}
 
 		return this.accountEquivalence;
-	}
-
-	getCommaAsDecimal(): boolean {
-
-		// Check if the setting is overriden by frontmatter
-		try {
-			const file = this.app.workspace.getActiveFile();
-			if (!file) throw new Error("No active file");
-
-			const metadata = this.app.metadataCache.getFileCache(file);
-			const fm = metadata?.frontmatter;
-
-			// override by frontmatter
-			if (fm && typeof fm["acj-commaAsDecimal"] === "boolean") {
-				return fm["acj-commaAsDecimal"];
-			}
-		} catch (e) {
-		}
-
-		return this.settings.commaAsDecimal;
-
 	}
 
 
