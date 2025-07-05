@@ -46,6 +46,20 @@ export default class AccountingJournalPlugin extends Plugin {
 				AccountingTransformer.transformToJournal(source, el, accountEquiv, commaAsDecimalJournal);
 			});
 
+
+			// Accountability Journal, Diary Book (Libro diario) with a modern table style
+			this.registerMarkdownCodeBlockProcessor('acj-m', async (source, el, ctx) => {
+
+				// Check if is commaAsDecimal is overriden by local config through props
+				const commaAsDecimalJournal: boolean = this.getCommaAsDecimal()
+
+				const accountEquiv: accountEquivalent = await this.getaccountEquivalence();
+
+				AccountingTransformer.transformToJournalModern(source, el, accountEquiv, commaAsDecimalJournal);
+
+			});
+
+			// Accountability Ledger, Ledger Book (Libro mayor), in tradicional T accounting style
 			this.registerMarkdownCodeBlockProcessor('acl', async (source, el, ctx) => {
 
 				// Check if is commaAsDecimal is overriden by local config through props
@@ -136,6 +150,7 @@ export default class AccountingJournalPlugin extends Plugin {
 
 		return this.accountEquivalence;
 	}
+
 	getCommaAsDecimal(): boolean {
 
 		// Check if the setting is overriden by frontmatter

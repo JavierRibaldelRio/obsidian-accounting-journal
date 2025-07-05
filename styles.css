@@ -8,6 +8,8 @@
 * Styles for journal entries
 */
 
+
+
 div.acjp-error {
 
 
@@ -30,10 +32,12 @@ table.acjp-table {
     border: 0;
 }
 
-.acjp-table .acjp-center {
-
+.acjp-table .acjp-center,
+.acjp-modern-table .acjp-center,
+.acjp-ledger-table .acjp-center {
     text-align: center;
 }
+
 
 
 .acjp-table .acjp-number {
@@ -65,8 +69,59 @@ table.acjp-table {
 /* Adds read color to journal if it is not balanced (selector .class1.class2 aplies the format to those HTML elements that have both classes */
 
 .acjp-table.acjp-not-balanced tbody tr:last-child td:nth-child(even),
-.acjp-table.acjp-not-balanced tbody tr:first-child td:nth-child(even) {
+.acjp-table.acjp-not-balanced tbody tr:first-child td:nth-child(even),
+table.acjp-modern-table.acjp-not-balanced,
+table.acjp-modern-table.acjp-not-balanced thead tr td {
     border-color: var(--text-error, #ff0000);
+}
+
+
+
+table.acjp-modern-table.acjp-not-balanced tbody tr:last-child td {
+
+    border-bottom-color: var(--text-error, #ff0000);
+}
+
+/**
+* Styles for  modern journal entries
+*/
+
+table.acjp-modern-table {
+
+    border-collapse: collapse;
+
+    width: 100%;
+    border: 2px solid;
+}
+
+table.acjp-modern-table tbody {}
+
+table.acjp-modern-table thead tr td {
+
+    border: 2px solid;
+    border-bottom: 4px solid;
+
+    text-align: center;
+
+}
+
+table.acjp-modern-table tbody tr td.acjp-number {
+
+    text-align: right;
+    width: 20%;
+}
+
+table.acjp-modern-table tbody tr td.acjp-ledger-account-name {
+
+    width: 50%;
+    text-align: left;
+}
+
+
+
+/* Concept */
+table.acjp-modern-table tbody tr:last-child td {
+    border-bottom: 2px solid;
 }
 
 /**
@@ -86,8 +141,8 @@ table.acjp-ledger-table {
 
 
 table.acjp-ledger-table thead tr td {
-
-    border-bottom: 1.5px solid;
+    border: 0;
+    border-bottom: 2px solid;
     text-align: center;
 }
 
@@ -97,7 +152,7 @@ table.acjp-ledger-table tbody tr td {
 
 table.acjp-ledger-table tbody tr td:first-child {
     width: 50%;
-    border-right: 1.5px solid;
+    border-right: 2px solid;
     text-align: left;
 
     padding-left: 8%;
@@ -105,9 +160,8 @@ table.acjp-ledger-table tbody tr td:first-child {
 
 table.acjp-ledger-table tbody tr td:last-child {
     width: 50%;
-    border-left: 1.5px solid;
+    border-left: 2px solid;
     text-align: right;
 
     padding-right: 8%;
-
 }
