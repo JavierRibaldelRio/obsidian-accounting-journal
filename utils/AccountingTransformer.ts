@@ -1,11 +1,9 @@
-import type { accountEquivalent, JournalEntries, JournalEntry, JournalEntryLine } from '../types/accountingTypes'
+import type {
+    accountEquivalent, JournalEntries, JournalEntry, JournalEntryLine, FullJournalEntryParams,
+    LedgerEntryParams
+} from '../types/accountingTypes'
 
-type FullJournalEntryParams = {
-    date: string;
-    description: string;
-    entries: JournalEntries;
-    balanced: boolean;
-};
+
 
 export class FullJournalEntry {
     date: string;
@@ -18,6 +16,18 @@ export class FullJournalEntry {
         this.description = description;
         this.entries = entries;
         this.balanced = balanced;
+    }
+}
+
+export class LedgerEntry {
+    account: string;                    // Account code
+    entries: [number[], number[]];      // Entries in the form of [debit, credit]
+    sum: number;                        // Sum of the amounts to check if the entry is balanced
+
+    constructor({ account, entries, sum }: LedgerEntryParams) {
+        this.account = account
+        this.entries = entries;
+        this.sum = sum;
     }
 }
 
@@ -134,13 +144,10 @@ export class AccountingTransformer {
         });
     }
 
-
-
     static createJournalEntryHTML(fullJourntal: FullJournalEntry, el: HTMLElement, commaAsDecimal: boolean): void {
 
         const { date, description, entries, balanced } = fullJourntal;
 
-        console.log('date :>> ', date);
 
         // Create the table & adding red border when needed
         const table = el.createEl('table', { attr: { class: "acjp-table" + (!balanced ? " acjp-not-balanced" : '') } });
@@ -153,9 +160,6 @@ export class AccountingTransformer {
         entries.forEach((entry) => {
             const debits = entry[0];
             const credits = entry[1];
-
-            console.log('debits :>> ', debits);
-            console.log('credits :>> ', credits);
 
             const max = Math.max(debits.length, credits.length);
 
@@ -183,7 +187,126 @@ export class AccountingTransformer {
     }
 
 
+    static transformToLedger(content: string, el: HTMLElement, acEquiv: accountEquivalent, commaAsDecimal: boolean): void {
 
+        try {
+            const ledger = this.generateLedger(content, acEquiv);
+
+            this.createLedgerEntryHTML(ledger, el, commaAsDecimal);
+
+        } catch (error) {
+            console.error('Error generating accounting ledger entries: ', error);
+            el.createEl('div', {
+                text: 'Error generating ledger entries: ' + error.message, attr: { class: 'acjp-error' }
+            });
+        }
+    }
+
+
+    static generateLedger(content: string, acEquiv: accountEquivalent): LedgerEntry {
+
+        const firstLineEnd = content.indexOf('\n');
+        let account = content.substring(0, firstLineEnd).trim();
+
+
+
+        // Validate that the account is not empty
+        if (!account) {
+            throw new Error("Invalid ledger entry format. The first line should contain the account code.");
+        }
+
+        // Trys to get the account name from the equivalences
+        let accountName: string | undefined = acEquiv[account];
+
+        if (accountName) {
+            account = '(' + account + ') ' + accountName; // If the name exists, add it to the account
+        }
+
+
+        const parts = content.substring(firstLineEnd)
+            .split(/-{3,}/)                 // Split by each entry
+            .map(entry => entry.trim())     // Trim each entry
+            .filter(entry => entry !== "")  // Remove empty entries  
+
+        if (parts.length !== 2) {
+            throw new Error("Invalid ledger entry format. Each entry should have a debit and credit section separated by '---'.");
+        }
+
+        let sum: number = 0; // Sum of the amounts to check if the entry is balanced
+
+        const [debitString, creditString] = parts;
+
+        // Function to format each line as a number and add it to the sum
+        // Throws an error if the amount is not a valid number
+        function formatAsLedgerLine(note: string): number {
+            let amount: number = Number(note);
+
+            if (isNaN(amount)) {
+                amount = Number(note.replace(',', '.'));
+            }
+            if (isNaN(amount)) {
+                throw new Error(`Invalid amount "${note}" in entry: ${note}.` + "\nPlease ensure that the amount is a valid number using a period (.) as the decimal separator, and do not use commas (,) for thousands.");
+            }
+
+            sum += amount;
+
+            return amount
+        }
+
+        // Process debit 
+        const debit = debitString.split('\n')
+            .filter(line => line.trim() !== "")
+            .map(formatAsLedgerLine);
+
+        sum = -sum; // The debit and credit are equal, so we invert the sum to later check if the entry is balanced (sum === 0)
+
+        // Process credit
+        const credit: number[] = creditString.split('\n')
+            .filter(line => line.trim() !== "")
+            .map(formatAsLedgerLine);
+
+
+        return new LedgerEntry({
+            account: account,
+            entries: [debit, credit],
+            sum: sum
+        })
+    }
+
+
+    static createLedgerEntryHTML(ledger: LedgerEntry, el: HTMLElement, commaAsDecimal: boolean): void {
+        const { account, entries, sum } = ledger;
+
+        // Create the table
+        const table = el.createEl('table', { attr: { class: "acjp-ledger-table" } });
+
+        // Create the header row
+        const header = table.createEl('thead');
+        const headerRow = header.createEl('tr');
+        headerRow.createEl('td', { text: account, attr: { colspan: "2", class: "acjp-center" } });
+
+        // Create the body
+        const body = table.createEl('tbody');
+        const debit = entries[0];
+        const credit = entries[1];
+
+        const max = Math.max(debit.length, credit.length);
+
+        for (let i = 0; i < max; i++) {
+            const debitAmount: string = this.formatLocaleNumber(debit[i] || 0, commaAsDecimal);
+            const creditAmount: string = this.formatLocaleNumber(credit[i] || 0, commaAsDecimal);
+
+            const row = body.createEl("tr");
+            row.createEl('td', { text: debitAmount, attr: { class: 'acjp-number' } });
+            row.createEl('td', { text: creditAmount, attr: { class: 'acjp-number' } });
+        }
+
+        // Adds empty extra row
+
+        const extraRow = body.createEl("tr");
+        extraRow.createEl('td', { text: '', attr: { class: 'acjp-number' } });
+        extraRow.createEl('td', { text: '', attr: { class: 'acjp-number' } });
+    }
 
     /**
      * Formats a number according to the selected locale.

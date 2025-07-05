@@ -1,4 +1,4 @@
-import { Plugin, TFile, Notice } from 'obsidian';
+import { Plugin, TFile, Notice, Editor, MarkdownView } from 'obsidian';
 
 import { AccountingJournalSettingsTab } from 'src/AccountingJournalSettingTab';
 import type { accountEquivalent } from 'types/accountingTypes';
@@ -32,7 +32,6 @@ export default class AccountingJournalPlugin extends Plugin {
 
 
 		// Select accounting codes
-
 		this.app.workspace.onLayoutReady(async () => {
 			await this.generateAccountEquivalence();
 
@@ -45,6 +44,17 @@ export default class AccountingJournalPlugin extends Plugin {
 				const accountEquiv: accountEquivalent = await this.getaccountEquivalence();
 
 				AccountingTransformer.transformToJournal(source, el, accountEquiv, commaAsDecimalJournal);
+			});
+
+			this.registerMarkdownCodeBlockProcessor('acl', async (source, el, ctx) => {
+
+				// Check if is commaAsDecimal is overriden by local config through props
+				const commaAsDecimalLedger: boolean = this.getCommaAsDecimal()
+
+				const accountEquiv: accountEquivalent = await this.getaccountEquivalence();
+
+				AccountingTransformer.transformToLedger(source, el, accountEquiv, commaAsDecimalLedger);
+
 			});
 
 		});
