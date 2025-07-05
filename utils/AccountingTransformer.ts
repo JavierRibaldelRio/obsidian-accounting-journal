@@ -192,7 +192,13 @@ export class AccountingTransformer {
      */
     static formatLocaleNumber(num: number, commaAsDecimal: boolean): string {
 
-        return (num !== undefined && !isNaN(num)) ? Intl.NumberFormat(commaAsDecimal ? 'es-ES' : 'en-US').format(num) : '';
+        return (num !== undefined && !isNaN(num)) ? Intl.NumberFormat(commaAsDecimal ? 'es-ES' : 'en-US',
+            {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+                useGrouping: true // Forces the thousands separator
+            }
+        ).format(num) : '';
 
     }
 }
