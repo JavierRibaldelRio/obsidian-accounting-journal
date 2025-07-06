@@ -43,8 +43,6 @@ export default class AccountingJournalPlugin extends Plugin {
 				// Check if is commaAsDecimal is overriden by local config through props
 				const commaAsDecimalJournal: boolean = this.getCommaAsDecimal()
 				const journalSeparator: string = this.getJournalSeparator();
-
-				console.log('journalSeparator :>> ', journalSeparator);
 				const accountEquiv: accountEquivalent = await this.getaccountEquivalence();
 
 				AccountingTransformer.transformToJournal(source, el, accountEquiv, commaAsDecimalJournal, journalSeparator);
@@ -56,7 +54,6 @@ export default class AccountingJournalPlugin extends Plugin {
 
 				// Check if is commaAsDecimal is overriden by local config through props
 				const commaAsDecimalJournal: boolean = this.getCommaAsDecimal()
-
 				const accountEquiv: accountEquivalent = await this.getaccountEquivalence();
 
 				AccountingTransformer.transformToJournalModern(source, el, accountEquiv, commaAsDecimalJournal);
@@ -68,13 +65,63 @@ export default class AccountingJournalPlugin extends Plugin {
 
 				// Check if is commaAsDecimal is overriden by local config through props
 				const commaAsDecimalLedger: boolean = this.getCommaAsDecimal()
-
 				const accountEquiv: accountEquivalent = await this.getaccountEquivalence();
 
 				AccountingTransformer.transformToLedger(source, el, accountEquiv, commaAsDecimalLedger);
 
 			});
+
+
+
 		});
+
+		this.addCommand({
+			id: 'fix-accounting',
+			name: 'Fix accounting entries',
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
+
+
+
+				// Check if there is an active file from editor
+				const file = this.app.workspace.getActiveFile();
+				if (!file) {
+					new Notice("No active file to fix accounting entries.");
+					return;
+				}
+
+
+				// Get settings
+				const commaAsDecimal: boolean = this.getCommaAsDecimal();
+				const journalSeparator: string = this.getJournalSeparator();
+				const accountEquiv: accountEquivalent = await this.getaccountEquivalence();
+
+				this.app.vault.process(file, (data: string) => {
+					return data
+						// Replace acj 
+						.replace(/```acj\s*\n([\s\S]*?)```/g, (match, content) => {
+
+							const el = document.createElement('div');
+							AccountingTransformer.transformToJournal(content, el, accountEquiv, commaAsDecimal, journalSeparator);
+							return new XMLSerializer().serializeToString(el);
+						})
+						// Replace acj-m
+						.replace(/```acj-m\s*\n([\s\S]*?)```/g, (match, content) => {
+
+							const el = document.createElement('div');
+							AccountingTransformer.transformToJournalModern(content, el, accountEquiv, commaAsDecimal);
+							return new XMLSerializer().serializeToString(el);
+						})
+						// Replace acl
+						.replace(/```acl\s*\n([\s\S]*?)```/g, (match, content) => {
+
+							const el = document.createElement('div');
+							AccountingTransformer.transformToLedger(content, el, accountEquiv, commaAsDecimal);
+							return new XMLSerializer().serializeToString(el);
+						});
+				});
+			}
+		});
+
 
 	}
 
