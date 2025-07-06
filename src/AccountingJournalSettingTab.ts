@@ -18,7 +18,7 @@ export class AccountingJournalSettingsTab extends PluginSettingTab {
         // Commas As decimal
         new Setting(containerEl)
             .setName('Use comma as decimal separator (European system)')
-            .setDesc('If enabled, numbers will use a comma (e.g. 1.103,14) instead of a dot (e.g. 1,103.14) as the decimal separator. This only applies to output formatting; for input, both formats are supported.')
+            .setDesc('If enabled, numbers will use a comma (e.g. 1.103,14) instead of a dot (e.g. 1,103.14) as the decimal separator. This only applies to output formatting; for input, both formats are supported.\nThis setting can be overridden by the frontmatter property: acj-commaAsDecimal')
             .addToggle((tog) =>
                 tog
                     .setValue(this.plugin.settings.commaAsDecimal)
@@ -31,7 +31,7 @@ export class AccountingJournalSettingsTab extends PluginSettingTab {
         // Journal separator
         new Setting(containerEl)
             .setName('Journal separator')
-            .setDesc('Character used to separate the credit and debit columns in the journal. This is used to format the journal entries.')
+            .setDesc('Character used to separate the credit and debit columns in the journal. This is used to format the journal entries.\nThis setting can be overridden by the frontmatter property: acj-journalSeparator')
             .addText(text =>
                 text
                     .setPlaceholder('-')
@@ -46,8 +46,7 @@ export class AccountingJournalSettingsTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Default account equivalence file')
-            .setDesc('Path to the CSV file in your vault used to resolve account name equivalents. '
-            )
+            .setDesc('Path to the CSV file in your vault used to resolve account name equivalents.\nThis setting can be overridden by the frontmatter property: acj-accountEquivalence')
             .addText(text =>
                 text
                     .setPlaceholder('folder/file.csv')
