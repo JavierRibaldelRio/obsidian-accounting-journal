@@ -159,14 +159,13 @@ export class AccountingTransformer {
 
         const { date, description, entries, balanced } = fullJournal;
 
-
         // Create the table & adding red border when needed
-        const table = el.createEl('table', { attr: { class: "acjp-table" + (!balanced ? " acjp-not-balanced" : '') } });
+        const table = el.createEl('table', { cls: "acjp-table" + (!balanced ? " acjp-not-balanced" : '') });
 
         // Create the header row
         const header = table.createEl('thead');
         const headerRow = header.createEl('tr');
-        headerRow.createEl('td', { text: date, attr: { colspan: "5", class: "acjp-center" } });
+        headerRow.createEl('td', { text: date, cls: "acjp-center", attr: { colspan: 5 } });
 
         entries.forEach((entry) => {
             const debits = entry[0];
@@ -176,7 +175,6 @@ export class AccountingTransformer {
 
             const body = table.createEl('tbody');
 
-
             for (let i = 0; i < max; i++) {
                 const debitAccount: string = this.formatJournalAccountName(debits[i]);
                 const creditAccount: string = this.formatJournalAccountName(credits[i]);
@@ -185,16 +183,16 @@ export class AccountingTransformer {
                 const creditAmount: string = this.formatLocaleNumber(credits[i]?.[0], commaAsDecimal);
 
                 const row = body.createEl("tr");
-                row.createEl('td', { text: debitAmount, attr: { class: 'acjp-number' } });
-                row.createEl('td', { text: debitAccount, attr: { class: 'acjp-name' } });
-                row.createEl('td', { text: separator, attr: { class: 'acjp-separator acjp-center' } }); // separator
-                row.createEl('td', { text: creditAccount, attr: { class: 'acjp-name' } });
-                row.createEl('td', { text: creditAmount, attr: { class: 'acjp-number' } });
+                row.createEl('td', { text: debitAmount, cls: 'acjp-number' });
+                row.createEl('td', { text: debitAccount, cls: 'acjp-name' });
+                row.createEl('td', { text: separator, cls: 'acjp-separator acjp-center' });
+                row.createEl('td', { text: creditAccount, cls: 'acjp-name' });
+                row.createEl('td', { text: creditAmount, cls: 'acjp-number' });
             }
         });
 
         // Entry description
-        table.createEl('tbody').createEl('tr').createEl('td', { text: description, attr: { colspan: "5", class: 'acjp-center' } });
+        table.createEl('tbody').createEl('tr').createEl('td', { text: description, attr: { colspan: 5 }, cls: 'acjp-center' });
     }
 
     static formatJournalAccountName(journalLine: JournalEntryLine): string {
@@ -222,20 +220,20 @@ export class AccountingTransformer {
         const { date, description, entries, balanced } = fullJournal;
 
         // Create the table & adding red border when needed
-        const table = el.createEl('table', { attr: { class: "acjp-modern-table" + (!balanced ? " acjp-not-balanced" : '') } });
+        const table = el.createEl('table', { cls: "acjp-modern-table" + (!balanced ? " acjp-not-balanced" : '') });
 
         // Create the header row
         const header = table.createEl('thead');
         const headerRow = header.createEl('tr');
-        headerRow.createEl('td', { text: "Particulars", attr: { class: 'acjp-center' } });
-        headerRow.createEl('td', { text: "Ref", attr: { class: 'acjp-center' } });
-        headerRow.createEl('td', { text: "Debit", attr: { class: 'acjp-center' } });
-        headerRow.createEl('td', { text: "Credit", attr: { class: 'acjp-center' } });
+        headerRow.createEl('td', { text: "Particulars", cls: 'acjp-center' });
+        headerRow.createEl('td', { text: "Ref", cls: 'acjp-center' });
+        headerRow.createEl('td', { text: "Debit", cls: 'acjp-center' });
+        headerRow.createEl('td', { text: "Credit", cls: 'acjp-center' });
 
         entries.forEach((entry) => {
 
             const tbody = table.createEl('tbody');
-            tbody.createEl('tr').createEl('td', { text: date, attr: { colspan: "4" } });
+            tbody.createEl('tr').createEl('td', { text: date, attr: { colspan: 4 } });
 
             const debits = entry[0];
             const credits = entry[1];
@@ -247,17 +245,15 @@ export class AccountingTransformer {
 
                 const row = tbody.createEl("tr");
                 if (name) {
-                    row.createEl('td', { text: name, attr: { class: 'acjp-name' } });
-                    row.createEl('td', { text: account, attr: { class: 'acjp-name acjp-center' } });
+                    row.createEl('td', { text: name, cls: 'acjp-name' });
+                    row.createEl('td', { text: account, cls: 'acjp-name acjp-center' });
                 }
                 else {
-                    row.createEl('td', { text: account, attr: { class: 'acjp-name' } });
-                    row.createEl('td', { text: '', attr: { class: 'acjp-name acjp-center' } }); // Empty ref cell
+                    row.createEl('td', { text: account, cls: 'acjp-name' });
+                    row.createEl('td', { text: '', cls: 'acjp-name acjp-center' });
                 }
-                row.createEl('td', { text: debitAmount, attr: { class: 'acjp-number' } });
-                row.createEl('td', { text: '', attr: { class: 'acjp-number' } });           // Empty credit cell
-
-
+                row.createEl('td', { text: debitAmount, cls: 'acjp-number' });
+                row.createEl('td', { text: '', cls: 'acjp-number' });
             });
 
 
@@ -268,22 +264,21 @@ export class AccountingTransformer {
 
                 const row = tbody.createEl("tr");
                 if (name) {
-                    row.createEl('td', { text: name, attr: { class: 'acjp-name acjp-ledger-account-name' } });
-                    row.createEl('td', { text: account, attr: { class: 'acjp-name acjp-center' } });
+                    row.createEl('td', { text: name, cls: 'acjp-name acjp-ledger-account-name' });
+                    row.createEl('td', { text: account, cls: 'acjp-name acjp-center' });
                 }
                 else {
-                    row.createEl('td', { text: account, attr: { class: 'acjp-name acjp-ledger-account-name' } });
-                    row.createEl('td', { text: '', attr: { class: 'acjp-name acjp-center' } }); // Empty ref cell
+                    row.createEl('td', { text: account, cls: 'acjp-name acjp-ledger-account-name' });
+                    row.createEl('td', { text: '', cls: 'acjp-name acjp-center' });
                 }
-                row.createEl('td', { text: '', attr: { class: 'acjp-number' } });           // Empty debit cell
-                row.createEl('td', { text: creditAmount, attr: { class: 'acjp-number' } });
+                row.createEl('td', { text: '', cls: 'acjp-number' });
+                row.createEl('td', { text: creditAmount, cls: 'acjp-number' });
             });
 
 
             const row = tbody.createEl('tr');
-
-            row.createEl('td', { text: description, attr: { colspan: "2", class: 'acjp-center ' } });
-            row.createEl('td', { text: '', attr: { colspan: "2" } });
+            row.createEl('td', { text: description, attr: { colspan: 2 }, cls: 'acjp-center ' });
+            row.createEl('td', { text: '', attr: { colspan: 2 } });
         });
     }
 
@@ -378,12 +373,12 @@ export class AccountingTransformer {
         const { account, entries, sum } = ledger;
 
         // Create the table
-        const table = el.createEl('table', { attr: { class: "acjp-ledger-table" } });
+        const table = el.createEl('table', { cls: "acjp-ledger-table" });
 
         // Create the header row
         const header = table.createEl('thead');
         const headerRow = header.createEl('tr');
-        headerRow.createEl('td', { text: account, attr: { colspan: "2", class: "acjp-center" } });
+        headerRow.createEl('td', { text: account, attr: { colspan: 2 }, cls: "acjp-center" });
 
         // Create the body
         const body = table.createEl('tbody');
@@ -397,15 +392,15 @@ export class AccountingTransformer {
             const creditAmount: string = this.formatLocaleNumber(credit[i] || 0, commaAsDecimal);
 
             const row = body.createEl("tr");
-            row.createEl('td', { text: debitAmount, attr: { class: 'acjp-number' } });
-            row.createEl('td', { text: creditAmount, attr: { class: 'acjp-number' } });
+            row.createEl('td', { text: debitAmount, cls: 'acjp-number' });
+            row.createEl('td', { text: creditAmount, cls: 'acjp-number' });
         }
 
-        // Adds empty extra row
+        // Adds extra row empty
 
         const extraRow = body.createEl("tr");
-        extraRow.createEl('td', { text: '', attr: { class: 'acjp-number' } });
-        extraRow.createEl('td', { text: '', attr: { class: 'acjp-number' } });
+        extraRow.createEl('td', { text: '', cls: 'acjp-number' });
+        extraRow.createEl('td', { text: '', cls: 'acjp-number' });
     }
 
     /**
