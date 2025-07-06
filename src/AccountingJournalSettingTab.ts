@@ -1,10 +1,10 @@
-import AccountingJournalPlugin from "../main";
+import AccountingJournalLedger from "../main";
 import { App, PluginSettingTab, Setting, normalizePath } from 'obsidian';
 
 export class AccountingJournalSettingsTab extends PluginSettingTab {
-    plugin: AccountingJournalPlugin
+    plugin: AccountingJournalLedger
 
-    constructor(app: App, plugin: AccountingJournalPlugin) {
+    constructor(app: App, plugin: AccountingJournalLedger) {
         super(app, plugin);
         this.plugin = plugin;
     }

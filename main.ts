@@ -10,13 +10,13 @@ import pgcDataJson from './assets/PGC-2017.json';
 // Default account equivalence data
 const pgcData: accountEquivalent = pgcDataJson as accountEquivalent;
 
-interface AccountingJournalPluginSettings {
+interface AccountingJournalLedgerSettings {
 	commaAsDecimal: boolean;
 	journalSeparator: string
 	defaultEquivCsvPath: string
 }
 
-const DEFAULT_SETTINGS: AccountingJournalPluginSettings = {
+const DEFAULT_SETTINGS: AccountingJournalLedgerSettings = {
 	commaAsDecimal: false,
 	journalSeparator: '',
 	defaultEquivCsvPath: ''
@@ -25,9 +25,9 @@ const DEFAULT_SETTINGS: AccountingJournalPluginSettings = {
 /**
  * Main plugin class for the accounting journal and ledger in Obsidian.
  */
-export default class AccountingJournalPlugin extends Plugin {
+export default class AccountingJournalLedger extends Plugin {
 
-	settings: AccountingJournalPluginSettings;
+	settings: AccountingJournalLedgerSettings;
 	accountEquivalence: accountEquivalent;
 
 	/**
