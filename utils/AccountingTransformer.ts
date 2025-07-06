@@ -40,7 +40,8 @@ export class AccountingTransformer {
             const fullEntry = this.generateJournalEntries(content, acEquiv);
             this.createJournalEntryHTML(fullEntry, el, commaAsDecimal, separtor);
 
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Error generating accounting journal entries: ', error);
             el.createEl('div', {
                 text: 'Error generating journal entries: ' + error.message, attr: { class: 'acjp-error' }
@@ -54,7 +55,8 @@ export class AccountingTransformer {
             const fullEntry = this.generateJournalEntries(content, acEquiv);
             this.createJournalEntryHTMLModern(fullEntry, el, commaAsDecimal);
 
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Error generating accounting journal entries: ', error);
             el.createEl('div', {
                 text: 'Error generating journal entries: ' + error.message, attr: { class: 'acjp-error' }
@@ -76,6 +78,7 @@ export class AccountingTransformer {
 
         // sum stores the totals for debit and credit to check if the entry is balanced
         let sum: [number, number] = [0, 0];
+
         // balanced indicates if the entry is balanced
         let balanced: boolean = true;
 
@@ -286,10 +289,10 @@ export class AccountingTransformer {
 
         try {
             const ledger = this.generateLedger(content, acEquiv);
-
             this.createLedgerEntryHTML(ledger, el, commaAsDecimal);
 
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Error generating accounting ledger entries: ', error);
             el.createEl('div', {
                 text: 'Error generating ledger entries: ' + error.message, attr: { class: 'acjp-error' }
@@ -302,8 +305,6 @@ export class AccountingTransformer {
 
         const firstLineEnd = content.indexOf('\n');
         let account = content.substring(0, firstLineEnd).trim();
-
-
 
         // Validate that the account is not empty
         if (!account) {
@@ -344,7 +345,6 @@ export class AccountingTransformer {
             }
 
             sum += amount;
-
             return amount
         }
 

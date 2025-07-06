@@ -68,11 +68,7 @@ export default class AccountingJournalPlugin extends Plugin {
 				const accountEquiv: accountEquivalent = await this.getaccountEquivalence();
 
 				AccountingTransformer.transformToLedger(source, el, accountEquiv, commaAsDecimalLedger);
-
 			});
-
-
-
 		});
 
 		this.addCommand({
@@ -80,15 +76,12 @@ export default class AccountingJournalPlugin extends Plugin {
 			name: 'Fix accounting entries',
 			editorCallback: async (editor: Editor, view: MarkdownView) => {
 
-
-
 				// Check if there is an active file from editor
 				const file = this.app.workspace.getActiveFile();
 				if (!file) {
 					new Notice("No active file to fix accounting entries.");
 					return;
 				}
-
 
 				// Get settings
 				const commaAsDecimal: boolean = this.getCommaAsDecimal();
@@ -104,6 +97,7 @@ export default class AccountingJournalPlugin extends Plugin {
 							AccountingTransformer.transformToJournal(content, el, accountEquiv, commaAsDecimal, journalSeparator);
 							return new XMLSerializer().serializeToString(el);
 						})
+
 						// Replace acj-m
 						.replace(/```acj-m\s*\n([\s\S]*?)```/g, (match, content) => {
 
@@ -111,6 +105,7 @@ export default class AccountingJournalPlugin extends Plugin {
 							AccountingTransformer.transformToJournalModern(content, el, accountEquiv, commaAsDecimal);
 							return new XMLSerializer().serializeToString(el);
 						})
+
 						// Replace acl
 						.replace(/```acl\s*\n([\s\S]*?)```/g, (match, content) => {
 
@@ -187,7 +182,8 @@ export default class AccountingJournalPlugin extends Plugin {
 			if (fm && typeof fm["acj-commaAsDecimal"] === "boolean") {
 				return fm["acj-commaAsDecimal"];
 			}
-		} catch (e) {
+		}
+		catch (e) {
 		}
 
 		return this.settings.commaAsDecimal;
@@ -207,7 +203,8 @@ export default class AccountingJournalPlugin extends Plugin {
 			if (fm && typeof fm["acj-journalSeparator"] === "string") {
 				return fm["acj-journalSeparator"];
 			}
-		} catch (e) {
+		}
+		catch (e) {
 		}
 
 		return this.settings.journalSeparator;
@@ -233,7 +230,8 @@ export default class AccountingJournalPlugin extends Plugin {
 					throw new Error("No account equivalence file path found in frontmatter.");
 				}
 			}
-		} catch (e) {
+		}
+		catch (e) {
 			console.error("Error getting account equivalence from frontmatter:", e);
 
 			new Notice("Error getting account equivalence from frontmatter. Using default settings.");

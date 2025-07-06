@@ -57,12 +57,8 @@ export class AccountingJournalSettingsTab extends PluginSettingTab {
                         this.plugin.settings.defaultEquivCsvPath = normalizePath(value);
 
                         await this.plugin.saveSettings();
-
                         await this.plugin.generateAccountEquivalence();
-
-
                     })
             );
-
     }
 }
