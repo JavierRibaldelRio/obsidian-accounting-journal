@@ -422,8 +422,8 @@ export class AccountingTransformer {
         const max = Math.max(debit.length, credit.length);
 
         for (let i = 0; i < max; i++) {
-            const debitAmount: string = this.formatLocaleNumber(debit[i] || 0, commaAsDecimal);
-            const creditAmount: string = this.formatLocaleNumber(credit[i] || 0, commaAsDecimal);
+            const debitAmount: string = this.formatLocaleNumber(debit[i], commaAsDecimal);
+            const creditAmount: string = this.formatLocaleNumber(credit[i], commaAsDecimal);
 
             const row = body.createEl("tr");
             row.createEl('td', { text: debitAmount, cls: 'acjp-number' });
