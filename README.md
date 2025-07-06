@@ -1,94 +1,167 @@
-# Obsidian Sample Plugin
+# Accounting Journal and Ledger
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+A lightweight Obsidian plugin for recording simple journal entries in class, based on the Spanish _libro diario_ and _libro mayor_. Uses double-entry bookkeeping. Designed for educational use or for creating example entries easily — not a full accounting system.
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+## Features
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+- Register journal entries using standard format and classical Spanish format (*libro diario*)
+- Minimal interface focused on simplicity and clarity
+- Entries saved as Markdown for transparency and customization
+- Manual or file-based account recognition — you can provide your own chart of accounts
+- Convert journal or ledger to clean HTML directly from within the active Obsidian note
 
-## First time developing plugins?
+## Usage
 
-Quick starting guide for new plugin devs:
+### Journal and Ledger Entries
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+This plugin recognizes accounting entries written inside Markdown code blocks using **custom tags**. Each tag corresponds to a different entry format. 
 
-## Releasing new releases
+| Tag      | Format                       | Description                                                  |
+|----------|------------------------------|--------------------------------------------------------------|
+| `acj-m`  | Journal (Modern)             | One line per movement, concise and structured                |
+| `acj`    | Journal (Traditional Spanish)| Classic format used in Spanish accounting education          |
+| `acl`    | Ledger (T-Account Style)     | Visual layout of debit and credit similar to T-accounts      |
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+---
 
-## Adding your plugin to the community plugin list
+#### Format 1 & 2: Modern Journal (`acj-m`) and Traditional Spanish Journal (`acj`)
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+<pre>
+```acj-m
+{date},{concept}
+{debit account} - {amount}
+...
+---
+{credit account} - {amount}
+...
+===
+{debit account} - {amount}
+...
+---
+{credit account} - {amount}
+...
+```</pre>
+- **First line**: `date,concept` — the date of the transaction and a short description.
+- **Sections**:
+  - Each section contains a **debit group** (above `---`) and a **credit group** (below `---`).
+  - You can add multiple sections using `===`, useful for breaking the entry into phases or subcomponents.
+- The date and concept apply to the **entire block**, not just the first section
 
-## How to use
+##### Example
+<pre>
+```acj-m
+2025-07-31,Monthly Depreciation Entry
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+8040 - 750  
+8010 - 1000 
+---
+21 - 750
+11 - 1000  
+===
+8050 - 1200  
+8030 - 900
+---
+31 - 900
+51 - 1200
+```</pre>
 
-## Manually installing the plugin
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+<p align="center">
+  <img src="img/acj-m-out.png" alt="Ejemplo acj-m" width="45%" style="display:inline-block; margin-right:2%;"/>
+  <img src="img/acj-out.png" alt="Ejemplo acj" width="45%" style="display:inline-block;"/>
+</p>
 
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
+#### Format 3: Ledger
+<pre>
+```acl
+{account}
+{debit-amount}
+{debit-amount}
+...
+---
+{credit-amount}
+{credit-amount}
+...
+```</pre>
 
-## Funding URL
+##### Example
 
-You can include funding URLs where people who use your plugin can financially support it.
-
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
-
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
+<pre>
+```acl
+1200
+1020.23
+29020.20
+---
+1000
+12000
+24000000
 ```
+</pre>
 
-If you have multiple URLs, you can also do:
+<p align="center">
+  <img src="img/acl.png" alt="Ejemplo Ledger (T-Account Style)" width="60%"/>
+  <br><b>Ledger (T-Account Style)</b>
+</p>
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
+### Fix accounting entries
+
+The `Fix accounting entries` command transforms your accounting blocks (`acj`, `acj-m`, `acl`) into **static HTML previews** directly inside the note. This makes the entry visually clear and presentation-ready — but no longer editable from within the block.
+
+### Custom Chart of Accounts (CSV)
+
+You can use your own chart of accounts by selecting a CSV file from the plugin settings.
+#### CSV format
+
+```csv
+8010,Property Depreciation
+11,Property - Accumulated Depreciation
+1200,Bank
+1210,Cash
 ```
+The plugin will use it to display account names in fixed entries and exports. Remember that you must type the exact same code.
 
-## API Documentation
+---
 
-See https://github.com/obsidianmd/obsidian-api
+## Developer Setup
+
+If you want to contribute or test the plugin locally:
+
+1. Clone this repository
+2. Run `npm install` to install dependencies
+3. Run `npm run dev` to build and watch for changes
+4. In Obsidian, enable **Developer Mode** and load the plugin folder as a local plugin in `Vault/.obsidian/plugins/accounting-journal-ledger`
+
+The source code is written in TypeScript and uses standard Obsidian plugin APIs.
+
+---
+
+## Issues & Feature Requests
+
+Feel free to open an issue for:
+
+- Bug reports
+- Suggestions for small enhancements
+- Clarifications on usage
+
+You’re also welcome to request new features, **as long as they keep the plugin simple and focused on learning**.
+
+> This plugin is not intended to:
+> - Automatically generate ledgers from logic-heavy rules  
+> - Replace full accounting systems  
+> - Handle complex workflows like payroll engines or tax reporting
+
+
+---
+
+## License
+
+This project is under MIT License see [LICENSE](LICENSE) for more information
+
+
+---
+
+
+## Author
+
+Developed by [JavierRibaldelRio](https://github.com/JavierRibaldelRio)
