@@ -22,11 +22,17 @@ const DEFAULT_SETTINGS: AccountingJournalPluginSettings = {
 	defaultEquivCsvPath: ''
 };
 
+/**
+ * Main plugin class for the accounting journal and ledger in Obsidian.
+ */
 export default class AccountingJournalPlugin extends Plugin {
 
 	settings: AccountingJournalPluginSettings;
 	accountEquivalence: accountEquivalent;
 
+	/**
+	 * Called when the plugin is loaded.
+	 */
 	async onload() {
 
 		// Configure settings
@@ -120,13 +126,16 @@ export default class AccountingJournalPlugin extends Plugin {
 
 	}
 
+	/**
+	 * Generates the account equivalence from the configured CSV file or uses the default PGC data.
+	 */
 	async generateAccountEquivalence(): Promise<void> {
 
 		// Get the file path from settings
 		try {
 			const filePath = this.settings.defaultEquivCsvPath;
 
-			console.log('filePath :>> ', filePath);
+
 			if (!filePath || filePath === "/") {
 
 				console.info("Spanish account system data");
@@ -145,8 +154,11 @@ export default class AccountingJournalPlugin extends Plugin {
 		}
 	}
 
-
-	// Reads the CSV file and parses it into an accountEquivalent object
+	/**
+	 * Reads a CSV file and parses it into an accountEquivalent object.
+	 * @param filePath Path to the CSV file.
+	 * @returns Account equivalence object.
+	 */
 	async readCSVFile(filePath: string): Promise<accountEquivalent> {
 
 		if (!filePath) {
@@ -167,7 +179,10 @@ export default class AccountingJournalPlugin extends Plugin {
 
 	// Getters
 
-
+	/**
+	 * Gets whether to use comma as decimal separator, considering global settings and frontmatter.
+	 * @returns true if comma is used as decimal separator, false otherwise.
+	 */
 	getCommaAsDecimal(): boolean {
 
 		// Check if the setting is overriden by frontmatter
@@ -190,6 +205,10 @@ export default class AccountingJournalPlugin extends Plugin {
 
 	}
 
+	/**
+	 * Gets the journal separator, considering global settings and frontmatter.
+	 * @returns Journal separator string.
+	 */
 	getJournalSeparator(): string {
 		// Check if the setting is overriden by frontmatter
 		try {
@@ -210,6 +229,10 @@ export default class AccountingJournalPlugin extends Plugin {
 		return this.settings.journalSeparator;
 	}
 
+	/**
+	 * Gets the account equivalence, considering frontmatter and global settings.
+	 * @returns Account equivalence object.
+	 */
 	async getaccountEquivalence(): Promise<accountEquivalent> {
 
 		// Check if the setting is overriden by frontmatter
@@ -241,15 +264,26 @@ export default class AccountingJournalPlugin extends Plugin {
 		return this.accountEquivalence;
 	}
 
-
 	// Settings 
+
+	/**
+	 * Loads the plugin settings and adds the settings tab.
+	 */
 	async loadSettings() {
+
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 
-		// add the setting tap 
+		// Ensure the default values are set
+		if (!this.settings.defaultEquivCsvPath) {
+			this.settings.defaultEquivCsvPath = '';
+		}
+
 		this.addSettingTab(new AccountingJournalSettingsTab(this.app, this));
 	}
 
+	/**
+	 * Saves the plugin settings.
+	 */
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}

@@ -1,9 +1,12 @@
 import { accountEquivalent } from "../types/accountingTypes"
 
 /**
- * Transforms a 2 - column CSV string into a key - value map.
+ * Transforms a 2-column CSV string into a key-value map.
  * Ignores empty lines and trims spaces.
  * Throws an error if a row doesn't contain exactly 2 columns.
+ * @param csv The CSV string to parse.
+ * @returns An accountEquivalent object mapping keys to values.
+ * @throws Error if a line does not have exactly two columns or if any column is empty.
  */
 export function parseCSVAccountingEquivalences(csv: string): accountEquivalent {
     const map: accountEquivalent = {};

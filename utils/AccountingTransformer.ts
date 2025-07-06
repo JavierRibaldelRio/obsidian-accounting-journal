@@ -3,37 +3,21 @@ import type {
     LedgerEntryParams
 } from '../types/accountingTypes'
 
+import { FullJournalEntry, LedgerEntry } from './AccountingModels';
 
-
-export class FullJournalEntry {
-    date: string;
-    description: string;
-    entries: JournalEntries;
-    balanced: boolean;
-
-    constructor({ date, description, entries, balanced }: FullJournalEntryParams) {
-        this.date = date;
-        this.description = description;
-        this.entries = entries;
-        this.balanced = balanced;
-    }
-}
-
-export class LedgerEntry {
-    account: string;                    // Account code
-    entries: [number[], number[]];      // Entries in the form of [debit, credit]
-    sum: number;                        // Sum of the amounts to check if the entry is balanced
-
-    constructor({ account, entries, sum }: LedgerEntryParams) {
-        this.account = account
-        this.entries = entries;
-        this.sum = sum;
-    }
-}
-
+/**
+ * Provides static methods to transform, parse, and render accounting journal and ledger entries.
+ */
 export class AccountingTransformer {
 
-
+    /**
+     * Transforms raw content into a journal entry and renders it as HTML.
+     * @param content Raw journal entry text.
+     * @param el HTMLElement to render into.
+     * @param acEquiv Account equivalence map.
+     * @param commaAsDecimal Whether to use comma as decimal separator.
+     * @param separtor Separator string for the table.
+     */
     static transformToJournal(content: string, el: HTMLElement, acEquiv: accountEquivalent, commaAsDecimal: boolean, separtor: string): void {
 
         try {
@@ -49,6 +33,13 @@ export class AccountingTransformer {
         }
     }
 
+    /**
+     * Transforms raw content into a modern journal entry and renders it as HTML.
+     * @param content Raw journal entry text.
+     * @param el HTMLElement to render into.
+     * @param acEquiv Account equivalence map.
+     * @param commaAsDecimal Whether to use comma as decimal separator.
+     */
     static transformToJournalModern(content: string, el: HTMLElement, acEquiv: accountEquivalent, commaAsDecimal: boolean): void {
 
         try {
@@ -65,6 +56,13 @@ export class AccountingTransformer {
 
     }
 
+    /**
+     * Parses raw content into a FullJournalEntry object.
+     * @param content Raw journal entry text.
+     * @param acEquiv Account equivalence map.
+     * @returns FullJournalEntry object.
+     * @throws Error if the format is invalid.
+     */
     static generateJournalEntries(content: string, acEquiv: accountEquivalent): FullJournalEntry {
         // Get the first line to extract the date and description
         const firstLineEnd = content.indexOf('\n')
@@ -158,6 +156,13 @@ export class AccountingTransformer {
         });
     }
 
+    /**
+     * Renders a FullJournalEntry as a classic HTML table.
+     * @param fullJournal FullJournalEntry object.
+     * @param el HTMLElement to render into.
+     * @param commaAsDecimal Whether to use comma as decimal separator.
+     * @param separator Separator string for the table.
+     */
     static createJournalEntryHTML(fullJournal: FullJournalEntry, el: HTMLElement, commaAsDecimal: boolean, separator: string): void {
 
         const { date, description, entries, balanced } = fullJournal;
@@ -198,6 +203,11 @@ export class AccountingTransformer {
         table.createEl('tbody').createEl('tr').createEl('td', { text: description, attr: { colspan: 5 }, cls: 'acjp-center' });
     }
 
+    /**
+     * Formats a journal entry line to display the account name and code.
+     * @param journalLine JournalEntryLine array.
+     * @returns Formatted account name string.
+     */
     static formatJournalAccountName(journalLine: JournalEntryLine): string {
 
         if (journalLine) {
@@ -218,6 +228,12 @@ export class AccountingTransformer {
         }
     }
 
+    /**
+     * Renders a FullJournalEntry as a modern HTML table.
+     * @param fullJournal FullJournalEntry object.
+     * @param el HTMLElement to render into.
+     * @param commaAsDecimal Whether to use comma as decimal separator.
+     */
     static createJournalEntryHTMLModern(fullJournal: FullJournalEntry, el: HTMLElement, commaAsDecimal: boolean): void {
 
         const { date, description, entries, balanced } = fullJournal;
@@ -285,6 +301,13 @@ export class AccountingTransformer {
         });
     }
 
+    /**
+     * Transforms raw content into a ledger entry and renders it as HTML.
+     * @param content Raw ledger entry text.
+     * @param el HTMLElement to render into.
+     * @param acEquiv Account equivalence map.
+     * @param commaAsDecimal Whether to use comma as decimal separator.
+     */
     static transformToLedger(content: string, el: HTMLElement, acEquiv: accountEquivalent, commaAsDecimal: boolean): void {
 
         try {
@@ -300,7 +323,13 @@ export class AccountingTransformer {
         }
     }
 
-
+    /**
+     * Parses raw content into a LedgerEntry object.
+     * @param content Raw ledger entry text.
+     * @param acEquiv Account equivalence map.
+     * @returns LedgerEntry object.
+     * @throws Error if the format is invalid.
+     */
     static generateLedger(content: string, acEquiv: accountEquivalent): LedgerEntry {
 
         const firstLineEnd = content.indexOf('\n');
@@ -368,7 +397,12 @@ export class AccountingTransformer {
         })
     }
 
-
+    /**
+     * Renders a LedgerEntry as an HTML table.
+     * @param ledger LedgerEntry object.
+     * @param el HTMLElement to render into.
+     * @param commaAsDecimal Whether to use comma as decimal separator.
+     */
     static createLedgerEntryHTML(ledger: LedgerEntry, el: HTMLElement, commaAsDecimal: boolean): void {
         const { account, entries, sum } = ledger;
 
@@ -407,6 +441,9 @@ export class AccountingTransformer {
      * Formats a number according to the selected locale.
      * If commaAsDecimal is true, uses 'es-ES' (comma as decimal separator), otherwise 'en-US'.
      * Returns an empty string if the input is undefined.
+     * @param num Number to format.
+     * @param commaAsDecimal Whether to use comma as decimal separator.
+     * @returns Formatted number as string.
      */
     static formatLocaleNumber(num: number, commaAsDecimal: boolean): string {
 
