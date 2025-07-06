@@ -3,7 +3,7 @@
 	"name": "Accounting Journal and Ledger",
 	"version": "1.0.0",
 	"minAppVersion": "1.8.10",
-	"description": "Lightweight tool for recording simple journal entries in class, based on the Spanish libro diario and libro mayor (ledger). Uses double-entry bookkeeping. Designed for educational use or for creating example entries easily — not a full accounting system.",
+	"description": "Tool for recording simple journal entries in class, based on the Spanish libro diario and libro mayor (ledger). Uses double-entry bookkeeping. Designed for educational use or for creating example entries easily — not a full accounting system.",
 	"author": "Javier Ribal del Río",
 	"authorUrl": "https://github.com/JavierRibaldelRio",
 	"isDesktopOnly": false
